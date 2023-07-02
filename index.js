@@ -39,7 +39,7 @@ app.get('/api/:date', (req, res) => {
   }
   var response;
   if (isNaN(time.getTime())) {
-    response = {error: "Invaid Date"};
+    response = {error: "Invalid Date"};
   }
   else {
     response = {
