@@ -2,6 +2,7 @@
 // where your node app starts
 
 // init project
+require('dotenv').config();
 var express = require('express');
 var app = express();
 
@@ -12,6 +13,11 @@ app.use(cors({optionsSuccessStatus: 200}));  // some legacy browsers choke on 20
 
 // http://expressjs.com/en/starter/static-files.html
 app.use(express.static('public'));
+
+app.use((req, res, next) => {
+  console.log(req.method, " ", req.path, " ", req.ip);
+  next();
+})
 
 // http://expressjs.com/en/starter/basic-routing.html
 app.get("/", function (req, res) {
@@ -24,7 +30,33 @@ app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
 
+app.get('/api/:date', (req, res) => {
+  console.log(req.params.date);
+  var time = new Date(req.params.date);
+  if (isNaN(time.valueOf())) {
+    console.log('timestamp input');
+    time = new Date(+req.params.date);
+  }
+  var response;
+  if (isNaN(time.getTime())) {
+    response = {error: "Invaid Date"};
+  }
+  else {
+    response = {
+      'unix': time.getTime(),
+      'utc': time.toUTCString()
+    };
+  }
+  res.json(response);
+});
 
+app.get('/api/', (req, res) => {
+  let time = new Date();
+  res.json({
+    'unix': time.getTime(),
+    'utc': time.toUTCString()
+  })
+})
 
 // listen for requests :)
 var listener = app.listen(process.env.PORT, function () {
